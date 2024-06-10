@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Review Order</title>
+</head>
+<body>
+<h1>Review Your Order</h1>
+<div th:if="${transaction}">
+    <p th:text="'Transaction ID: ' + ${transaction.id}"></p>
+    <p th:text="'User: ' + ${transaction.user.username}"></p>
+    <p th:text="'Total Amount: $' + ${transaction.totalAmount}"></p>
+
+    <h2>Items:</h2>
+    <ul>
+        <li th:each="item : ${transaction.transactionItems}">
+            <span th:text="${item.artPiece.title}"></span> -
+            <span th:text="${item.quantity}"></span> @
+            <span th:text="'$' + ${item.artPiece.price}"></span>
+        </li>
+    </ul>
+
+    <a th:href="'/transaction/execute-payment?paymentId=' + ${transaction.paymentId} + '&PayerID=' + ${transaction.payerId}">Complete Payment</a>
+</div>
+</body>
+</html>

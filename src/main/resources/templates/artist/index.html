@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Artists</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .search-form {
+            margin-bottom: 20px; /* Add margin below the search form */
+        }
+
+        .list-group {
+            margin-left: auto; /* Center the list */
+            margin-right: auto; /* Center the list */
+            max-width: 1200px; /* Limit the maximum width of the list */
+        }
+
+        .pagination {
+            justify-content: center; /* Center the pagination */
+        }
+
+        .artist-img {
+            width: 80px; /* Set the desired width */
+            height: 80px; /* Set the desired height */
+            border-radius: 15%; /* Make the image circular */
+            object-fit: cover; /* Maintain aspect ratio */
+            margin-right: 20px; /* Add margin to separate from text */
+        }
+
+        .artist-name {
+            font-size: 18px; /* Set the font size */
+            font-weight: 500; /* Make it bold */
+            color: #333; /* Set the text color */
+        }
+
+        .none-found {
+            text-align: center; /* Center the text */
+            font-size: 24px; /* Make the text bigger */
+            color: #333; /* Set the text color */
+        }
+
+        .button-container {
+            float: right; /* Position the button container on the right */
+        }
+
+        .button-container a {
+            margin-left: 10px; /* Add some space between the buttons */
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{fragments/_navigation_bar :: navigation}">
+</div>
+
+<!-- Add a search form -->
+<div class="container search-form">
+    <form th:action="@{/artist/get}" method="get" class="form-inline">
+        <div class="form-group mx-sm-3 mb-2">
+            <input type="text" class="form-control" name="search" placeholder="Search for artists...">
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Search</button>
+    </form>
+    <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/artist/create}" class="btn btn-success mb-2">Create Artist</a>
+</div>
+
+<!-- Display artists -->
+<div class="container">
+    <ul class="list-group">
+        <th:block th:each="artist : ${artists}">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a th:href="@{/artist/details(id=${artist.id})}">
+                    <img th:src="${artist.imagePath}" alt="Artist Image" class="artist-img">
+                    <span th:text="${artist.name}" class="artist-name"></span>
+                </a>
+                <div class="button-container">
+                    <a th:href="@{/artist/details(id=${artist.id})}" class="btn btn-primary">Details</a>
+                    <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/artist/edit(id=${artist.id})}" class="btn btn-warning">Edit</a>
+                    <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/artist/delete(id=${artist.id})}" class="btn btn-danger">Delete</a>
+                </div>
+            </li>
+        </th:block>
+    </ul>
+</div>
+
+<!-- Add pagination -->
+<div th:if="${artists.size() > 0 or totalPages > 1}" class="container mt-3">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                <a th:href="@{/artist/get(search=${search}, page=${currentPage - 1})}" class="page-link">&laquo; Previous</a>
+            </li>
+            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/artist/get(search=${search}, page=${pageNumber})}"
+                   th:text="${pageNumber + 1}" class="page-link"
+                   th:classappend="${pageNumber == currentPage ? 'active' : ''}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                <a th:href="@{/artist/get(search=${search}, page=${currentPage + 1})}" class="page-link">Next &raquo;</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<div th:if="${artists.size() == 0 and totalPages <= 1}" class="none-found">
+    <p>No matching artists found!</p>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Artist Details</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    .artist-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .artist-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .artist-img {
+      width: 200px;
+      height: 200px;
+      border-radius: 10%;
+      object-fit: cover;
+      margin-right: 20px;
+    }
+
+    .artist-name {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .artist-description {
+      font-size: 1.2em;
+      color: #555;
+    }
+
+    .art-piece-list {
+      margin-top: 30px;
+    }
+
+    .art-piece-title {
+      display: inline-block;
+      vertical-align: middle;
+      font-size: 1.2em;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .art-piece-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+    }
+
+    .art-piece-img {
+      max-height: 200px;
+      max-width: 200px;
+      padding: 10px;
+      border-radius: 20px;
+      margin-right: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 2em;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+<div th:insert="~{fragments/_navigation_bar :: navigation}"></div>
+
+<div class="artist-container">
+  <div class="artist-header">
+    <img th:src="${artist.imagePath}" alt="Artist Image" class="artist-img">
+    <div>
+      <h1 class="artist-name" th:text="${artist.name}">Artist Name</h1>
+      <p class="artist-description" th:text="${artist.description}">Artist Description</p>
+    </div>
+  </div>
+
+  <h2>Art Pieces</h2>
+  <div class="art-piece-list">
+    <div class="view-art-button">
+      <a th:href="@{/artpiece/get(artistName=${artist.name})}" class="btn btn-primary" style="margin-top: 20px; width: 100%">View Art in Shop</a>
+    </div>
+
+      <div th:each="artPiece : ${artist.artPieces}" class="art-piece-item">
+        <a th:href="@{/artpiece/details(id=${artPiece.id})}">
+          <img th:src="${artPiece.imagePath}" alt="Art Piece Image" class="art-piece-img">
+          <span class="art-piece-title" th:text="${artPiece.title}">Art Piece Title</span>
+        </a>
+      </div>
+
+  </div>
+
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

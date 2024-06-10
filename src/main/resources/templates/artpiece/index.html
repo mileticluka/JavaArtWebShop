@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Art Pieces</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .search-form {
+      margin-bottom: 20px;
+    }
+    .filter-card {
+      margin-bottom: 20px;
+    }
+    .filter-card .card-body {
+      padding: 15px;
+    }
+    .btn-filter {
+      float: right;
+    }
+    .art-piece-card {
+      margin-bottom: 20px;
+      height: 600px;
+    }
+    .art-piece-card img {
+      width: 100%;
+      height: auto;
+      max-height: 400px;
+      object-fit: cover;
+    }
+    .art-piece-card .card-body {
+      overflow: auto;
+      font-size: 14px;
+    }
+    .none-found {
+      text-align: center;
+      font-size: 24px;
+      color: #333;
+    }
+    .pagination {
+      justify-content: center;
+    }
+    /* Adjusting column width to ensure equal size */
+    .art-piece-col {
+      padding: 0 15px;
+    }
+  </style>
+
+</head>
+<body>
+<div th:insert="~{fragments/_navigation_bar :: navigation}"></div>
+
+<div class="container filter-card">
+  <div class="card">
+    <div class="card-body">
+      <form id="filter-form" class="form-inline">
+        <input type="text" name="title" placeholder="Title" class="form-control mr-2">
+        <input type="text" name="artistName" placeholder="Artist" class="form-control mr-2">
+        <input type="text" name="categoryName" placeholder="Category" class="form-control mr-2">
+        <input type="number" step="0.01" name="minPrice" placeholder="Min Price" class="form-control mr-2">
+        <input type="number" step="0.01" name="maxPrice" placeholder="Max Price" class="form-control mr-2">
+        <button type="submit" class="btn btn-primary btn-filter" style="width: 99%; margin-top: 10px">Filter</button>
+      </form>
+      <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/artpiece/create}" class="btn btn-primary" style="margin-top: 10px">Create</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <!-- Adjusted column width for equal size -->
+    <div class="col-md-4 art-piece-col" th:each="artPiece, iterStat : ${artPieces}">
+      <div class="card art-piece-card">
+        <img th:src="@{${artPiece.imagePath}}" th:alt="${artPiece.title}" class="card-img-top">
+        <div class="card-body">
+          <h5 class="card-title" th:text="${artPiece.title}">Title</h5>
+          <p class="card-text">
+            <strong>Artist:</strong> <span th:text="${artPiece.artist.name}">Artist</span><br>
+            <strong>Category:</strong> <span th:text="${artPiece.category.name}">Category</span><br>
+            <strong>Price:</strong> <span class="price" th:text="${artPiece.price}">0.00</span>
+          </p>
+          <span th:text="${artPiece.description}" class="art-piece-description"></span>
+        </div>
+        <a th:href="@{/artpiece/details(id=${artPiece.id})}" class="btn btn-primary" style="margin: 10px">Details</a>
+
+        <!-- Centered container for input and button -->
+        <div class="text-center" style="margin-top: 10px;">
+          <input type="number" th:id="'quantityInput' + ${iterStat.index}" th:name="'quantityInput' + ${iterStat.index}" value="1" min="1" style="width: 60px; margin-right: 5px;">
+          <button th:onclick="|addToCart(${artPiece.id}, document.getElementById('quantityInput' + ${iterStat.index}).value)|" class="btn btn-primary" style="margin: 10px">Add to Cart</button>        <!-- Add button container for Edit and Delete -->
+          <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/artpiece/edit(id=${artPiece.id})}" class="btn btn-warning">Edit</a>
+          <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/artpiece/delete(id=${artPiece.id})}" class="btn btn-danger">Delete</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:if="${artPieces.size() > 0 or totalPages > 1}" class="container mt-3">
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+        <a th:href="@{/artpiece/get(page=${currentPage - 1}, size=${size}, title=${param.title}, artistName=${param.artistName}, categoryName=${param.categoryName}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}" class="page-link">&laquo; Previous</a>
+      </li>
+      <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${pageNumber == currentPage ? 'active' : ''}">
+        <a th:href="@{/artpiece/get(page=${pageNumber}, size=${size}, title=${param.title}, artistName=${param.artistName}, categoryName=${param.categoryName}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}" th:text="${pageNumber + 1}" class="page-link"></a>
+      </li>
+      <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+        <a th:href="@{/artpiece/get(page=${currentPage + 1}, size=${size}, title=${param.title}, artistName=${param.artistName}, categoryName=${param.categoryName}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}" class="page-link">Next &raquo;</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<div th:if="${artPieces.size() == 0 and totalPages <= 1}" class="none-found">
+  <p>No matching art pieces found!</p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Select all elements with the 'price' class
+    const priceElements = document.querySelectorAll('.price');
+
+    // Format each price element
+    priceElements.forEach(function(element) {
+      const price = parseFloat(element.textContent);
+      // Format the price using Intl.NumberFormat
+      const formattedPrice = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+      }).format(price);
+      // Update the text content of the element with the formatted price
+      element.textContent = formattedPrice;
+    });
+  });
+</script>
+<script>
+  function addToCart(id, quantity) {
+    $.ajax({
+      type: "GET",
+      url: "/cart/add-to-cart",
+      data: {
+        id: id,
+        quantity: quantity
+      },
+      success: function(response) {
+        // Handle success response
+        console.log(response); // Log success message
+        // Optionally, you can perform further actions like updating UI
+      },
+      error: function(xhr, status, error) {
+        // Handle error response
+        console.error(xhr.responseText); // Log error message
+        // Optionally, you can display an error message to the user
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

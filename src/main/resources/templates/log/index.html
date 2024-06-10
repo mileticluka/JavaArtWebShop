@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Logs</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .list-group {
+            margin-left: auto; /* Center the list */
+            margin-right: auto; /* Center the list */
+            max-width: 1200px; /* Limit the maximum width of the list */
+        }
+
+        .log-time {
+            font-size: 18px; /* Set the font size */
+            font-weight: 500; /* Make it bold */
+            color: #333; /* Set the text color */
+        }
+
+        .log-message {
+            padding-left: 20px;
+            font-size: 14px; /* Set the font size */
+            font-weight: 300; /* Make it bold */
+            color: #333; /* Set the text color */
+        }
+
+        .none-found {
+            text-align: center; /* Center the text */
+            font-size: 24px; /* Make the text bigger */
+            color: #333; /* Set the text color */
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{fragments/_navigation_bar :: navigation}">
+</div>
+
+<!-- Display logs -->
+<div class="container">
+    <ul class="list-group">
+        <th:block th:each="log : ${logs}">
+            <li class="list-group-item">
+                <span th:text="${log.time}" class="log-time"></span>
+                <span th:text="${log.message}" class="log-message"></span>
+            </li>
+        </th:block>
+    </ul>
+</div>
+
+<div th:if="${logs.size() == 0}" class="none-found">
+    <p>No logs found!</p>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- JavaScript to format the log time -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Select all elements with the 'log-time' class
+        const logTimeElements = document.querySelectorAll('.log-time');
+
+        // Function to format the date and time
+        function formatDateTime(dateTimeStr) {
+            const date = new Date(dateTimeStr);
+            const options = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+            };
+            return date.toLocaleString('en-US', options);
+        }
+
+        // Format each log time element
+        logTimeElements.forEach(function(element) {
+            const dateTimeStr = element.textContent;
+            element.textContent = formatDateTime(dateTimeStr);
+        });
+    });
+</script>
+
+</body>
+</html>

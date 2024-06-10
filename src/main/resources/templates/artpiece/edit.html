@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Edit Art Piece</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .form-container {
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 800px;
+            margin-top: 50px;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .image-preview {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{fragments/_navigation_bar :: navigation}"></div>
+
+<div class="container form-container">
+    <h2 class="form-title">Edit Art Piece</h2>
+    <form th:action="@{/artpiece/edit}" th:object="${artPiece}" method="post">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" th:field="*{title}" placeholder="Enter title">
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title is required.</div>
+        </div>
+        <div class="form-group">
+            <label for="artist">Artist</label>
+            <select class="form-control" id="artist" name="artist.id" th:field="*{artist.id}">
+                <option th:each="artist : ${artists}" th:value="${artist.id}" th:text="${artist.name}">Select Artist</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select class="form-control" id="category" name="category.id" th:field="*{category.id}">
+                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}">Select Category</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" th:field="*{description}" placeholder="Enter description"></textarea>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Description is required.</div>
+        </div>
+        <div class="form-group">
+            <label for="imagePath">Image Path</label>
+            <input type="text" class="form-control" id="imagePath" name="imagePath" th:field="*{imagePath}" placeholder="Enter image path" oninput="updateImagePreview()">
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('imagePath')}" th:errors="*{imagePath}">Image path is required.</div>
+        </div>
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" step=".01" class="form-control" id="price" name="price" th:field="*{price}" placeholder="Enter price">
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Price is required.</div>
+        </div>
+        <div class="form-group">
+            <img id="imagePreview" class="image-preview" th:src="${artPiece.imagePath}" alt="Image preview">
+        </div>
+        <div class="form-group">
+            <input type="hidden" th:field="*{id}">
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a th:href="@{/artpiece/get}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Custom JS to update image preview -->
+<script>
+    function updateImagePreview() {
+        const imagePathInput = document.getElementById('imagePath');
+        const imagePreview = document.getElementById('imagePreview');
+        imagePreview.src = imagePathInput.value;
+    }
+
+    // Set initial image preview if the input already has a value
+    document.addEventListener("DOMContentLoaded", function() {
+        updateImagePreview();
+    });
+</script>
+</body>
+</html>

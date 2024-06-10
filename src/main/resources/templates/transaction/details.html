@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Transaction Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .transaction-details {
+            margin-top: 20px;
+        }
+        .transaction-details .card {
+            margin-bottom: 20px;
+        }
+        .transaction-summary {
+            font-size: 16px;
+        }
+        .transaction-summary .total-amount {
+            font-weight: bold;
+        }
+        .none-found {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{fragments/_navigation_bar :: navigation}"></div>
+
+<div class="container transaction-details" th:if="${transaction}">
+    <div class="card">
+        <div class="card-header">
+            Transaction Details
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Transaction ID: <span th:text="${transaction.id}">1</span></h5>
+            <p class="card-text">Transaction Date: <span th:text="${#temporals.format(transaction.transactionDate, 'dd MMM yyyy HH:mm')}">Date</span></p>
+            <p class="card-text">Customer: <span th:text="${transaction.user.username}">Username</span></p>
+            <p class="card-text">Transaction Type: <span th:text="${transaction.getTransactionType()}">Type</span></p>
+            <div class="transaction-summary">
+                <h6>Transaction Items:</h6>
+                <ul>
+                    <li th:each="item : ${transaction.transactionItems}">
+                        <span th:text="${item.quantity}"></span> x
+                        <span th:text="${item.artPiece.title}">Art Piece Title</span> -
+                        <span th:text="${item.artPiece.price}">0.00</span> USD
+                    </li>
+                </ul>
+                <p class="total-amount">Total Amount: <span th:text="${transaction.totalAmount}">0.00</span> USD</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="none-found" th:if="${message}">
+    <p th:text="${message}">Error message</p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Select all elements with the 'total-amount' class
+        const totalAmountElement = document.querySelector('.total-amount span');
+
+        // Format the total amount element
+        const totalAmount = parseFloat(totalAmountElement.textContent);
+        // Format the amount using Intl.NumberFormat
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        }).format(totalAmount);
+        // Update the text content of the element with the formatted amount
+        totalAmountElement.textContent = formattedAmount;
+    });
+</script>
+</body>
+</html>
